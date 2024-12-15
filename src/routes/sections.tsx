@@ -49,7 +49,7 @@ const RedirectToHome = ({ children }: { children: JSX.Element }) => {
   const location = useLocation();
 
   // If authenticated and on /login, redirect to /
-  if (isAuth && location.pathname === '/login') {
+  if ((isAuth && location.pathname === '/login') || location.pathname === '/sign-in-vlu') {
     return <Navigate to="/" replace />;
   }
 
@@ -99,11 +99,13 @@ export function Router() {
     {
       path: '/sign-in-vlu',
       element: (
-        <AuthLayout>
-          <SuspenseWrapper>
-            <SignInVLUPage />
-          </SuspenseWrapper>
-        </AuthLayout>
+        <RedirectToHome>
+          <AuthLayout>
+            <SuspenseWrapper>
+              <SignInVLUPage />
+            </SuspenseWrapper>
+          </AuthLayout>
+        </RedirectToHome>
       ),
     },
     {
