@@ -37,7 +37,10 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
   }, []);
-
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
   const handleClosePopover = useCallback(() => {
     setOpenPopover(null);
   }, []);
@@ -129,7 +132,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button onClick = {handleLogout} fullWidth color="error" size="medium" variant="text">
             Logout
           </Button>
         </Box>
