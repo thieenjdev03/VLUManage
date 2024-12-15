@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import { Outlet, Navigate, useRoutes, useLocation } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
@@ -20,7 +20,6 @@ export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
-
 // Loading fallback
 const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
@@ -34,14 +33,29 @@ const renderFallback = (
     />
   </Box>
 );
-
 // Authentication check function
-const isAuthenticated = () => localStorage.getItem('token');
+const isAuthenticated = () => !!localStorage.getItem('msal.account.keys');
 
-// Private Route Component
-const PrivateRoute = ({ children }: { children: JSX.Element }) => 
-  isAuthenticated() ? children : <Navigate to="/login" replace />;
+// Private Route Component for Protected Routes
+const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+  const isAuth = isAuthenticated();
 
+  // Redirect to /login if not authenticated
+  return isAuth ? children : <Navigate to="/login" replace />;
+};
+// Redirect Component for Public Routes (like /login)
+const RedirectToHome = ({ children }: { children: JSX.Element }) => {
+  const isAuth = isAuthenticated();
+  const location = useLocation();
+
+  // If authenticated and on /login, redirect to /
+  if (isAuth && location.pathname === '/login') {
+    return <Navigate to="/" replace />;
+  }
+
+  // Otherwise, render the children (e.g., the login page)
+  return children;
+};
 
 // Suspense Wrapper
 const SuspenseWrapper = ({ children }: { children: JSX.Element }) => (
@@ -73,11 +87,13 @@ export function Router() {
     {
       path: '/login',
       element: (
-        <AuthLayout>
-          <SuspenseWrapper>
-            <SignInPage />
-          </SuspenseWrapper>
-        </AuthLayout>
+        <RedirectToHome>
+          <AuthLayout>
+            <SuspenseWrapper>
+              <SignInPage />
+            </SuspenseWrapper>
+          </AuthLayout>
+        </RedirectToHome>
       ),
     },
     {

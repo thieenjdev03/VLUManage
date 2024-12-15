@@ -1,19 +1,17 @@
 import 'src/global.css';
-
 import Fab from '@mui/material/Fab';
-
 import { Router } from 'src/routes/sections';
-
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
-
 import { ThemeProvider } from 'src/theme/theme-provider';
-
 import { Iconify } from 'src/components/iconify';
+import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
+import { msalConfig } from './sections/auth/msalConfig';
 
 // ----------------------------------------------------------------------
-
 export default function App() {
   useScrollToTop();
+  const msalInstance = new PublicClientApplication(msalConfig);
 
   const githubButton = (
     <Fab
@@ -37,8 +35,10 @@ export default function App() {
 
   return (
     <ThemeProvider>
+      <MsalProvider instance={msalInstance}>
+        {githubButton}
+      </MsalProvider>
       <Router />
-      {githubButton}
     </ThemeProvider>
   );
 }

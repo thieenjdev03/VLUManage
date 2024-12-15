@@ -12,7 +12,6 @@ export default function Page() {
       <Helmet>
         <title> {`Đăng Nhập - ${CONFIG.appName}`}</title>
       </Helmet>
-
       <SignInView />
     </>
   );

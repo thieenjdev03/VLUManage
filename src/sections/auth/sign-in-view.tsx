@@ -2,24 +2,40 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest, msalConfig } from "src/authConfig";
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-  const [showPassword, setShowPassword] = useState(false);
-
   type LoginCardProps = {
     title: string;
     image: string;
     description: string;
     text: string;
     link: string;
+    msAuth?: boolean;
   };
   const navigate = useNavigate();
+  const { instance } = useMsal();
+  const router = useRouter();
 
-  const LoginCard = ({ title, image, description, text, link }: LoginCardProps) => (
+  const handleMsAuth = () =>{ 
+    console.log('handleLogin', msalConfig);
+    instance
+    .loginPopup(loginRequest)
+    .then((response) => {
+      console.log("Login success:", response);
+      router.push('/');
+    })
+    .catch((error) => {
+      console.error("Login failed:", error);
+    });
+  }
+  const LoginCard = ({ title, image, description, text, link, msAuth}: LoginCardProps) => (
     <Box
-      onClick={() => (navigate(link))}
+      onClick={() => (!msAuth ? navigate(link) : handleMsAuth())}
       className="login-item-card flex flex-col items-center justify-between"
       sx={{
         borderRadius: 1,
@@ -56,6 +72,7 @@ export function SignInView() {
     </Box>
   );
 
+  
   return (
     <div className="flex flex-col items-center">
       <h1
@@ -74,7 +91,8 @@ export function SignInView() {
           image="https://static.vecteezy.com/system/resources/thumbnails/028/339/963/small_2x/microsoft-icon-logo-symbol-free-png.png"
           description="Sinh Viên & Quản Lý"
           text="Đăng nhập với tài khoản Microsoft 365."
-          link="/sign-in-vlu" // Link trang đích
+          link="/sign-in-vlu" 
+          msAuth
         />
         <LoginCard
           title="Văn Lang"

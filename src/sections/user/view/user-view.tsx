@@ -80,7 +80,7 @@ export function UserView() {
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Name' },
+                  { id: 'name', label: 'Họ Tên' },
                   { id: 'company', label: 'Ngày Tạo' },
                   { id: 'role', label: 'Chức vụ' },
                   { id: 'isVerified', label: 'Verified', align: 'center' },

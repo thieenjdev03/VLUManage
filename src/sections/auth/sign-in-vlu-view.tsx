@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -8,15 +8,39 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import { PublicClientApplication } from '@azure/msal-browser';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest, msalConfig } from "src/authConfig";
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
 import { Button } from '@mui/material';
 // ----------------------------------------------------------------------
 
 export function SignInVLUView() {
+  const { instance } = useMsal();
+
+  useEffect(() => {
+    instance.handleRedirectPromise().then((response) => {
+      if (response) {
+        console.log("Login success:", response);
+      }
+    });
+  }, [instance]);
   const router = useRouter();
+
+  const handleLogin = () => {
+    console.log('handleLogin', msalConfig?.auth?.redirectUri);
+    instance
+      .loginPopup(loginRequest)
+      .then((response) => {
+        console.log("Login success:", response);
+        router.push('/');
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+      });
+  };
+
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -70,41 +94,41 @@ export function SignInVLUView() {
   );
 
   return (
-      <div className="ml-auto mr-auto rounded-sm bg-white p-8 rounded-md">
-        <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-          <span style={{ color: '#D62134', fontSize: '20px', fontWeight: 'bold' }}>
-            Đăng Nhập Bằng Tài Khoản VLU
-          </span>
-          <span
-            style={{
-              color: '#2D334D',
-              fontSize: '13px',
-              fontWeight: 'normal',
-              width: '70%',
-              textAlign: 'center',
-            }}
-          >
-            {' '}
-            Chỉ dành cho quản lý hoặc Admin mới có thể đăng nhập
-          </span>
-        </Box>
-        {renderForm}
-        <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-          <Typography
-            variant="overline"
-            sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
-          >
-            OR
-          </Typography>
-        </Divider>
-        <Box gap={1} display="flex" justifyContent="center">
-          <Button variant="outlined">
-            <IconButton color="inherit">
-              <Iconify icon="logos:google-icon" />
-            </IconButton>
-            Microsoft 365
-          </Button>
-        </Box>
+    <div className="ml-auto mr-auto rounded-sm bg-white p-8 rounded-md">
+      <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
+        <span style={{ color: '#D62134', fontSize: '20px', fontWeight: 'bold' }}>
+          Đăng Nhập Bằng Tài Khoản VLU
+        </span>
+        <span
+          style={{
+            color: '#2D334D',
+            fontSize: '13px',
+            fontWeight: 'normal',
+            width: '70%',
+            textAlign: 'center',
+          }}
+        >
+          {' '}
+          Chỉ dành cho quản lý hoặc Admin mới có thể đăng nhập
+        </span>
+      </Box>
+      {renderForm}
+      <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
+        <Typography
+          variant="overline"
+          sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
+        >
+          OR
+        </Typography>
+      </Divider>
+      <Box gap={1} display="flex" justifyContent="center">
+        <Button onClick={handleLogin} variant="outlined">
+          <IconButton color="inherit">
+            <Iconify icon="logos:google-icon" />
+          </IconButton>
+          Microsoft 365
+        </Button>
+      </Box>
     </div>
   );
 }
