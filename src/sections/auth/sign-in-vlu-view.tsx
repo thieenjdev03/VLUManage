@@ -22,6 +22,7 @@ export function SignInVLUView() {
 
   const handleSignIn = useCallback(() => {
     router.push('/');
+    localStorage.setItem('token', 'true');
   }, [router]);
 
   const renderForm = (

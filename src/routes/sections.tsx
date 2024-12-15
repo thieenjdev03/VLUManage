@@ -10,6 +10,7 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 
 // ----------------------------------------------------------------------
 
+// Lazy-loaded pages
 export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
@@ -20,6 +21,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // ----------------------------------------------------------------------
 
+// Loading fallback
 const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
     <LinearProgress
@@ -33,15 +35,33 @@ const renderFallback = (
   </Box>
 );
 
+// Authentication check function
+const isAuthenticated = () => localStorage.getItem('token');
+
+// Private Route Component
+const PrivateRoute = ({ children }: { children: JSX.Element }) => 
+  isAuthenticated() ? children : <Navigate to="/login" replace />;
+
+
+// Suspense Wrapper
+const SuspenseWrapper = ({ children }: { children: JSX.Element }) => (
+  <Suspense fallback={renderFallback}>{children}</Suspense>
+);
+
+// ----------------------------------------------------------------------
+
+// Main Router
 export function Router() {
   return useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <PrivateRoute>
+          <DashboardLayout>
+            <SuspenseWrapper>
+              <Outlet />
+            </SuspenseWrapper>
+          </DashboardLayout>
+        </PrivateRoute>
       ),
       children: [
         { element: <HomePage />, index: true },
@@ -54,7 +74,9 @@ export function Router() {
       path: '/login',
       element: (
         <AuthLayout>
-          <SignInPage />
+          <SuspenseWrapper>
+            <SignInPage />
+          </SuspenseWrapper>
         </AuthLayout>
       ),
     },
@@ -62,13 +84,19 @@ export function Router() {
       path: '/sign-in-vlu',
       element: (
         <AuthLayout>
-          <SignInVLUPage />
+          <SuspenseWrapper>
+            <SignInVLUPage />
+          </SuspenseWrapper>
         </AuthLayout>
       ),
     },
     {
       path: '404',
-      element: <Page404 />,
+      element: (
+        <SuspenseWrapper>
+          <Page404 />
+        </SuspenseWrapper>
+      ),
     },
     {
       path: '*',

@@ -30,17 +30,12 @@ export const _users = [...Array(24)].map((_, index) => ({
   status: index % 4 ? 'active' : 'banned',
   role:
     [
-      'Leader',
-      'Hr Manager',
-      'UI Designer',
-      'UX Designer',
-      'UI/UX Designer',
-      'Project Manager',
-      'Backend Developer',
-      'Full Stack Designer',
-      'Front End Developer',
-      'Full Stack Developer',
-    ][index] || 'UI Designer',
+      'Super Admin',
+      'Admin',
+      'Sinh Viên',
+      'Bản Chủ Nhiệm Khoa',
+      'CVHT',
+    ][index] || 'Sinh Viên',
 }));
 
 // ----------------------------------------------------------------------

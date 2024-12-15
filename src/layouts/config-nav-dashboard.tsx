@@ -20,17 +20,17 @@ export const navData = [
   },
   {
     title: 'Quản Lý Học Kỳ',
-    path: '/products',
+    path: '/404',
     icon: icon('ic-cart'),
   },
   {
     title: 'Quản Lý Ngành',
-    path: '/blog',
+    path: '/404',
     icon: icon('ic-blog'),
   },
   {
     title: 'Quản Lý Khóa',
-    path: '/login',
+    path: '/404',
     icon: icon('ic-lock'),
   },
   {
