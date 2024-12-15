@@ -16,20 +16,21 @@ export function Main({ sx, children, layoutQuery, ...other }: MainProps) {
   const theme = useTheme();
 
   const renderContent = (
+  <>
+   
     <Box
       sx={{
         py: 5,
         px: 3,
-        width: 1,
         borderRadius: 2,
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: 'background.default',
         maxWidth: 'var(--layout-auth-content-width)',
       }}
     >
       {children}
     </Box>
+  </>
   );
 
   return (

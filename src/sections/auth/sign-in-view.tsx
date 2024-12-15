@@ -1,110 +1,96 @@
-import { useState, useCallback } from 'react';
-
+import { useState } from 'react';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
-import InputAdornment from '@mui/material/InputAdornment';
-
-import { useRouter } from 'src/routes/hooks';
-
-import { Iconify } from 'src/components/iconify';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-  const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  type LoginCardProps = {
+    title: string;
+    image: string;
+    description: string;
+    text: string;
+    link: string;
+  };
+  const navigate = useNavigate();
 
-  const renderForm = (
-    <Box display="flex" flexDirection="column" alignItems="flex-end">
-      <TextField
-        fullWidth
-        name="email"
-        label="Email address"
-        defaultValue="hello@gmail.com"
-        InputLabelProps={{ shrink: true }}
-        sx={{ mb: 3 }}
+  const LoginCard = ({ title, image, description, text, link }: LoginCardProps) => (
+    <Box
+      onClick={() => (navigate(link))}
+      className="login-item-card flex flex-col items-center justify-between"
+      sx={{
+        borderRadius: 1,
+        p: 4,
+        textAlign: 'center',
+        backgroundColor: 'white',
+        width: '32%',
+        minHeight: '260px',
+        cursor: 'pointer', // Hiển thị con trỏ tay khi hover
+        boxShadow: 3,
+        transition: 'transform 0.2s',
+        '&:hover': {
+          transform: 'scale(1.05)', // Hiệu ứng phóng to khi hover
+        },
+      }}
+    >
+      <img
+        src={image}
+        alt={title}
+        className="login-item-img"
+        style={{ width: '80px', height: '80px', borderRadius: 1, marginBottom: 8 }}
       />
-
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
-
-      <TextField
-        fullWidth
-        name="password"
-        label="Password"
-        defaultValue="@demo1234"
-        InputLabelProps={{ shrink: true }}
-        type={showPassword ? 'text' : 'password'}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-        sx={{ mb: 3 }}
-      />
-
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        color="inherit"
-        variant="contained"
-        onClick={handleSignIn}
-      >
-        Sign in
-      </LoadingButton>
+      <div className="flex flex-col gap-1 h-3/5">
+        <Typography variant="h5" className="login-item-title login-item-text-color">
+          {title}
+        </Typography>
+        <Typography variant="body1" className="login-item-description text-md login-item-text-color">
+          {description}
+        </Typography>
+        <Typography variant="body1" className="login-item-text login-item-text-color">
+          {text}
+        </Typography>
+      </div>
     </Box>
   );
 
   return (
-    <>
-      <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Sign in</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
-          </Link>
-        </Typography>
-      </Box>
-
-      {renderForm}
-
-      <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-        <Typography
-          variant="overline"
-          sx={{ color: 'text.secondary', fontWeight: 'fontWeightMedium' }}
-        >
-          OR
-        </Typography>
-      </Divider>
-
-      <Box gap={1} display="flex" justifyContent="center">
-        <IconButton color="inherit">
-          <Iconify icon="logos:google-icon" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="eva:github-fill" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify icon="ri:twitter-x-fill" />
-        </IconButton>
-      </Box>
-    </>
+    <div className="flex flex-col items-center">
+      <h1
+        className="login-title"
+        style={{
+          color: 'white',
+          fontSize: '2.5rem',
+          fontWeight: 700,
+        }}
+      >
+        ĐĂNG NHẬP
+      </h1>
+      <div className="flex gap-10">
+        <LoginCard
+          title="Microsoft 365"
+          image="https://static.vecteezy.com/system/resources/thumbnails/028/339/963/small_2x/microsoft-icon-logo-symbol-free-png.png"
+          description="Sinh Viên & Quản Lý"
+          text="Đăng nhập với tài khoản Microsoft 365."
+          link="/sign-in-vlu" // Link trang đích
+        />
+        <LoginCard
+          title="Văn Lang"
+          image="https://cdn.haitrieu.com/wp-content/uploads/2022/12/Icon-Dai-Hoc-Van-Lang.png"
+          description="Sinh Viên & Quản Lý"
+          text="Đăng nhập với tài khoản Văn Lang."
+          link="/sign-in-vlu" // Link trang đích
+        />
+        <LoginCard
+          title="Đăng nhập"
+          image="https://cdn-icons-png.flaticon.com/512/2942/2942813.png"
+          description="Supper Admin"
+          text="Đăng nhập với tài khoản được cấp cho Admin."
+          link="/sign-in-vlu" // Link nội bộ trang web
+        />
+      </div>
+    </div>
   );
 }

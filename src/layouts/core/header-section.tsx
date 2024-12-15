@@ -87,6 +87,7 @@ export function HeaderSection({
             alignItems: 'center',
             ...slotProps?.container?.sx,
           }}
+          style={{backgroundColor: '#D62134'}}
         >
           {slots?.leftArea}
 

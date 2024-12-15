@@ -9,37 +9,47 @@ const icon = (name: string) => (
 
 export const navData = [
   {
-    title: 'Dashboard',
+    title: 'Trang Chủ',
     path: '/',
     icon: icon('ic-analytics'),
   },
   {
-    title: 'User',
+    title: 'Quản Lý Người Dùng',
     path: '/user',
     icon: icon('ic-user'),
   },
   {
-    title: 'Product',
+    title: 'Quản Lý Học Kỳ',
     path: '/products',
     icon: icon('ic-cart'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
   },
   {
-    title: 'Blog',
+    title: 'Quản Lý Ngành',
     path: '/blog',
     icon: icon('ic-blog'),
   },
   {
-    title: 'Sign in',
-    path: '/sign-in',
+    title: 'Quản Lý Khóa',
+    path: '/login',
     icon: icon('ic-lock'),
   },
   {
-    title: 'Not found',
+    title: 'Quản Lý Lớp Niên Chế',
+    path: '/404',
+    icon: icon('ic-disabled'),
+  },
+  {
+    title: 'Quản Lý CVHT',
+    path: '/404',
+    icon: icon('ic-disabled'),
+  },
+  {
+    title: 'Quản Lý Sinh Viên Lớp Niên Chế',
+    path: '/404',
+    icon: icon('ic-disabled'),
+  },
+  {
+    title: 'Quản Lý Danh Mục Loại Xử Lý',
     path: '/404',
     icon: icon('ic-disabled'),
   },

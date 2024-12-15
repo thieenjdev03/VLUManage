@@ -1,8 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-
 import { CONFIG } from 'src/config-global';
-
-import { SignInView } from 'src/sections/auth';
+import { SignInVLUView } from 'src/sections/auth';
 
 // ----------------------------------------------------------------------
 
@@ -12,8 +10,7 @@ export default function Page() {
       <Helmet>
         <title> {`Đăng Nhập - ${CONFIG.appName}`}</title>
       </Helmet>
-
-      <SignInView />
+      <SignInVLUView />
     </>
   );
 }

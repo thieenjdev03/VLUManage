@@ -13,6 +13,7 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
+export const SignInVLUPage = lazy(() => import('src/pages/sign-in-vlu'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -50,10 +51,18 @@ export function Router() {
       ],
     },
     {
-      path: 'sign-in',
+      path: '/login',
       element: (
         <AuthLayout>
           <SignInPage />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: '/sign-in-vlu',
+      element: (
+        <AuthLayout>
+          <SignInVLUPage />
         </AuthLayout>
       ),
     },
