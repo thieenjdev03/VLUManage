@@ -6,6 +6,7 @@ import { msalConfig } from "src/authConfig";
 import { MsalProvider } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
 import App from './app';
+import 'bootstrap';
 
 
 // ----------------------------------------------------------------------

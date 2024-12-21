@@ -6,16 +6,13 @@ const redirectUriPROD = import.meta.env.VITE_REDIRECT_URI_LOGIN_PROD;
 
 const _redirectUri =
   window.location.href.includes("localhost")
-    ? 'http://localhost:3039/login'
-    :  window.location.href.includes("staging")
-    ? redirectUriSTAG
-    : 'https://vlu-manage.vercel.app/login';
+    ? redirectUriLocal :  window.location.href.includes("staging") ? redirectUriSTAG : redirectUriPROD;
 
+console.log('redirectUri', _redirectUri);
 export const msalConfig: Configuration = {
   auth: {
     clientId: "c6e8b39f-9e08-4ef1-86a2-0475a7c2160a",
-    // authority: "https://login.microsoftonline.com/47c420ea-a706-4112-a1a4-20826de6d439",
-    authority: "https://login.microsoftonline.com/common", // Cho phép Multi-Tenant
+    authority: "https://login.microsoftonline.com/common", 
     redirectUri: _redirectUri,
   },
   cache: {

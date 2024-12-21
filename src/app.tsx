@@ -7,6 +7,7 @@ import { Iconify } from 'src/components/iconify';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 import { msalConfig } from './sections/auth/msalConfig';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // ----------------------------------------------------------------------
 export default function App() {
