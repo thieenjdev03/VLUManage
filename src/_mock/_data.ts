@@ -9,6 +9,7 @@ import {
   _postTitles,
   _description,
   _productNames,
+  _email,
 } from './_mock';
 
 // ----------------------------------------------------------------------
@@ -24,6 +25,7 @@ export const _myAccount = {
 export const _users = [...Array(24)].map((_, index) => ({
   id: _id(index),
   name: _fullName(index),
+  email: _email(index),
   company: _company(index),
   isVerified: _boolean(index),
   avatarUrl: `/assets/images/avatar/avatar-${index + 1}.webp`,

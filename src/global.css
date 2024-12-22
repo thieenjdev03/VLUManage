@@ -1,4 +1,3 @@
-
 /** **************************************
 * Fonts: app
 *************************************** */
@@ -18,7 +17,6 @@
 
 /* chart */
 @import './components/chart/styles.css';
-
 
 /** **************************************\
 
@@ -61,32 +59,35 @@ input[type='number']::-webkit-inner-spin-button {
   margin: 0;
   -webkit-appearance: none;
 }
-.background-login{ 
+.v-primary-btn {
+  background-color: #d62134 !important;
+}
+.background-login {
   background-image: url('https://ejob.vlu.edu.vn/Content/images/Hall_VL_3.jpg');
 }
-.login-item-card{ 
-  .login-item-title{ 
-    color: #D62134;
+.login-item-card {
+  .login-item-title {
+    color: #d62134;
     font-size: 28px;
   }
-  .login-item-description{ 
+  .login-item-description {
     font-size: 20px;
   }
-  .login-item-text{ 
+  .login-item-text {
     font-size: 16px;
   }
   transition: 0.5s;
   &:hover {
-    background-color: #D62134;
-    .login-item-text-color{ 
+    background-color: #d62134;
+    .login-item-text-color {
       color: white;
     }
   }
 }
-.modal-in-user-list{ 
+.modal-in-user-list {
   height: 100%;
-  .modal-content{ 
+  .modal-content {
     position: absolute;
-    top:30%
+    top: 30%;
   }
 }

@@ -23,6 +23,7 @@ export type UserProps = {
   company: string;
   avatarUrl: string;
   isVerified: boolean;
+  email: string;
 };
 
 type UserTableRowProps = {
@@ -54,6 +55,10 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
+        </TableCell>
+
+        <TableCell component="th" scope="row">
+          {row.email}
         </TableCell>
 
         <TableCell>{row.company}</TableCell>

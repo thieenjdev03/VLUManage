@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@mui/material";
 import { Iconify } from 'src/components/iconify';
+import Box from '@mui/material/Box';
 import DropdownComponent from 'src/components/custom-select/DropdownComponent';
+
 type OptionType = {
   value: string;
   label: string;
@@ -24,6 +26,18 @@ const ModalAddUser: React.FC = () => {
     // Thực hiện xử lý logic khi thêm người dùng, ví dụ: gọi API.
     setFormData({ fullName: "", email: "", phone: "" }); // Reset form
   };
+
+  const majorOptions: OptionType[] = [
+    { value: "react", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue" },
+  ];
+
+  const roleOptions: OptionType[] = [
+    { value: "react", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue" },
+  ];
 
   return (
     <>
@@ -51,12 +65,12 @@ const ModalAddUser: React.FC = () => {
               <h5 className="modal-title" id="addUserModalLabel">
                 Thêm người dùng mới
               </h5>
-              <button
+              <Button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-              ></button>
+              />
             </div>
             <div className="modal-body">
               {/* Form */}
@@ -75,8 +89,6 @@ const ModalAddUser: React.FC = () => {
                     required
                   />
                 </div>
-                <DropdownComponent
-                />
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
                     Email
@@ -91,6 +103,22 @@ const ModalAddUser: React.FC = () => {
                     required
                   />
                 </div>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
+                  <DropdownComponent
+                    placeholder="Chọn ngành học"
+                    options={majorOptions}
+                    id="major-select"
+                    label="Ngành học"
+                  />
+
+                  <DropdownComponent
+                    placeholder="Chức vụ"
+                    options={roleOptions}
+                    id="role-select"
+                    label="Chọn Chức Vụ"
+                  />
+                </Box>
+
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">
                     Số điện thoại
@@ -105,7 +133,7 @@ const ModalAddUser: React.FC = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-success w-100">
+                <button type="submit" className="btn btn-success w-100 v-primary-btn">
                   Thêm
                 </button>
               </form>

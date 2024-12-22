@@ -8,7 +8,6 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import App from './app';
 import 'bootstrap';
 
-
 // ----------------------------------------------------------------------
 const msalInstance = new PublicClientApplication(msalConfig);
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);

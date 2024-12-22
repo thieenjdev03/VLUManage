@@ -90,6 +90,33 @@ export const _company = (index: number) =>
     '09/09/1999',
   ][index];
 
+  export const _email = (index: number) =>
+    [
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+      'xyz@gmnail.com',
+    ][index];
+
 export const _boolean = (index: number) =>
   [
     true,

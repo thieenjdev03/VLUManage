@@ -45,7 +45,7 @@ export function UserView() {
         <Typography variant="h4" flexGrow={1}>
           Quản Lý Người Dùng
         </Typography>
-        <ModalAddUser/>
+        <ModalAddUser />
       </Box>
 
       <Card>
@@ -75,10 +75,11 @@ export function UserView() {
                 }
                 headLabel={[
                   { id: 'name', label: 'Họ Tên' },
-                  { id: 'company', label: 'Ngày Tạo' },
+                  { id: 'email', label: 'Email' },
                   { id: 'role', label: 'Chức vụ' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
                   { id: 'status', label: 'Trạng Thái' },
+                  { id: 'isVerified', label: 'Verified', align: 'center' },
+                  { id: 'company', label: 'Ngày Tạo' },
                   { id: '', label: 'Edit' },
                 ]}
               />

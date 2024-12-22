@@ -1,6 +1,6 @@
 import { Configuration } from "@azure/msal-browser";
 
-const redirectUriLocal = import.meta.env.VITE_REDIRECT_URI_LOCAL;
+const redirectUriLocal = import.meta.env.VITE_URI_LOGIN_DEV;
 const redirectUriSTAG = import.meta.env.VITE_REDIRECT_URI_LOGIN_STAGING;
 const redirectUriPROD = import.meta.env.VITE_REDIRECT_URI_LOGIN_PROD;
 
