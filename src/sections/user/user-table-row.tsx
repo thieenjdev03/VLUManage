@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-
+import { useState, useCallback, useEffect } from 'react';
+import moment from 'moment';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
@@ -9,30 +9,38 @@ import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
-
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import type { User } from 'src/apis/types';
+import { find } from 'lodash';
+import { getListRole } from 'src/apis/services/userService';
+import { Button } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
+import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
-export type UserProps = {
-  id: string;
-  name: string;
-  role: string;
-  status: string;
-  company: string;
-  avatarUrl: string;
-  isVerified: boolean;
-  email: string;
-};
-
 type UserTableRowProps = {
-  row: UserProps;
+  row: User;
   selected: boolean;
   onSelectRow: () => void;
+  setUserSelected: Dispatch<SetStateAction<User | null>>;
+  roleList: { _id: string; tenrole: string }[];
+  onDeleteSuccess: () => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) {
+type Role = {
+  _id: string;
+  tenrole: string;
+};
+export function UserTableRow({
+  row,
+  selected,
+  onSelectRow,
+  setUserSelected,
+  roleList,
+  onDeleteSuccess,
+}: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -43,6 +51,58 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
     setOpenPopover(null);
   }, []);
 
+  const handleRenderStatusActive = (status: boolean) => {
+    const statusActive = status ? 'Đang hoạt động' : 'Đã khoá';
+    return statusActive;
+  };
+
+  const apiDeleteUser = async (id: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/admin/users/${id}`);
+      if (response.data) {
+        alert('Thao tác thành công!');
+        return true; // Return if successful
+      }
+      alert('Có lỗi xảy ra'); // Move outside of the else block
+      return false; // Return failure
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false; // Return failure in case of an error
+    }
+  };
+
+  const getTenRoleById = (
+    roles: { _id: string; tenrole: string }[],
+    id: string
+  ): string | undefined => {
+    const matchedRole = find(roles, { _id: id });
+    return matchedRole?.tenrole; // Return tenrole if match found, else undefined
+  };
+
+  const formatDateToLocal = (isoDate: string): string => {
+    const result = isoDate ? moment(isoDate).format('YYYY-MM-DD HH:mm:ss') : '-';
+    return result;
+  };
+  const handleAction = async (action: string, data: User) => {
+    switch (action) {
+      case 'edit':
+        setUserSelected(data);
+        break;
+      case 'delete': {
+        const confirmed = window.confirm(`Bạn có chắc muốn xoá người dùng ${data.displayName}?`);
+        if (confirmed) {
+          const success = await apiDeleteUser(data._id);
+          if (success) {
+            onDeleteSuccess();
+            handleClosePopover();
+          }
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  };
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -52,8 +112,11 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
 
         <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center">
-            <Avatar alt={row.name} src={row.avatarUrl} />
-            {row.name}
+            <Avatar
+              alt={row.displayName}
+              src="https://greekherald.com.au/wp-content/uploads/2020/07/default-avatar.png"
+            />
+            {row.displayName}
           </Box>
         </TableCell>
 
@@ -61,12 +124,12 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           {row.email}
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
+        <TableCell>{getTenRoleById(roleList, row.role)}</TableCell>
 
-        <TableCell>{row.role}</TableCell>
+        <TableCell>{formatDateToLocal(row.lastLogin)}</TableCell>
 
         <TableCell align="center">
-          {row.isVerified ? (
+          {row.status ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
             '-'
@@ -74,7 +137,10 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
         </TableCell>
 
         <TableCell>
-          <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
+          <Label color={!row.status ? 'error' : 'success'}>
+            {handleRenderStatusActive(row.status)}
+          </Label>
+          {/* <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label> */}
         </TableCell>
 
         <TableCell align="right">
@@ -107,12 +173,19 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             },
           }}
         >
-          <MenuItem onClick={handleClosePopover}>
-            <Iconify icon="solar:pen-bold" />
-            Chỉnh Sửa
+          <MenuItem onClick={() => handleAction('edit', row)}>
+            <Button
+              data-bs-toggle="modal"
+              data-bs-target="#editUserModal"
+              id="editUserModalLabel"
+              color="inherit"
+            >
+              <Iconify icon="solar:pen-bold" />
+              Chỉnh Sửa
+            </Button>
           </MenuItem>
 
-          <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={() => handleAction('delete', row)} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Xóa
           </MenuItem>

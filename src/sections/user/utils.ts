@@ -1,5 +1,4 @@
-import type { UserProps } from './user-table-row';
-
+import { User } from 'src/apis/types'; 
 // ----------------------------------------------------------------------
 
 export const visuallyHidden = {
@@ -53,7 +52,7 @@ export function getComparator<Key extends keyof any>(
 // ----------------------------------------------------------------------
 
 type ApplyFilterProps = {
-  inputData: UserProps[];
+  inputData: User[];
   filterName: string;
   comparator: (a: any, b: any) => number;
 };
@@ -71,7 +70,7 @@ export function applyFilter({ inputData, comparator, filterName }: ApplyFilterPr
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) => user.displayName.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 

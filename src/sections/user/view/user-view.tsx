@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
-
+import { useState, useCallback, useEffect } from 'react';
+import { getUsers, getListRole } from 'src/apis/services/userService';
+import ModalEditUser from 'src/components/user-list/modal-edit-user';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
@@ -11,34 +11,43 @@ import TablePagination from '@mui/material/TablePagination';
 import ModalAddUser from 'src/components/user-list/modal-add-user';
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
-
-import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-
-import { TableNoData } from '../table-no-data';
+import Select from 'react-select';
+import type { User } from 'src/apis/types';
+import { Role } from 'src/apis/types';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
-
-import type { UserProps } from '../user-table-row';
-
+import { emptyRows } from '../utils';
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
 
   const [filterName, setFilterName] = useState('');
+  const [userList, setUserList] = useState<User[]>([]);
+  const [userSelected, setUserSelected] = useState<User | null>(null);
+  const [roleList, setRoleList] = useState<Role[]>([]);
 
-  const dataFiltered: UserProps[] = applyFilter({
-    inputData: _users,
-    comparator: getComparator(table.order, table.orderBy),
-    filterName,
-  });
+  useEffect(() => {
+    handleInitData();
+    handleGetRoleList();
+  }, []);
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const handleGetRoleList = async () => {
+    const roles = await getListRole();
+    setRoleList(roles);
+  };
 
+  const handleDeleteSuccess = () => {
+    handleInitData(); // Re-fetch the user list
+  };
+
+  const handleInitData = async () => {
+    const users = await getUsers();
+    setUserList(users);
+  };
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={2} mt={1}>
@@ -47,17 +56,28 @@ export function UserView() {
         </Typography>
         <ModalAddUser />
       </Box>
-
       <Card>
-        <UserTableToolbar
-          numSelected={table.selected.length}
-          filterName={filterName}
-          onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFilterName(event.target.value);
-            table.onResetPage();
-          }}
-        />
-
+        <div className="flex align-items-center justify-end">
+          <Select
+            options={[
+              { value: 'all', label: 'Tất cả' },
+              { value: 'verified', label: 'Đã xác thực' },
+              { value: 'unverified', label: 'Chưa xác thực' },
+            ]}
+            placeholder="Lọc theo trạng thái"
+            isClearable
+            isSearchable={false}
+            onChange={(value) => console.log(value)}
+          />
+          <UserTableToolbar
+            numSelected={table.selected.length}
+            filterName={filterName}
+            onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setFilterName(event.target.value);
+              table.onResetPage();
+            }}
+          />
+        </div>
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -74,36 +94,34 @@ export function UserView() {
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Họ Tên' },
-                  { id: 'email', label: 'Email' },
+                  { id: 'displayName', label: 'Họ Tên' },
+                  { id: 'emailDisplay', label: 'Email' },
                   { id: 'role', label: 'Chức vụ' },
+                  { id: 'lastLogin', label: 'Lần Cuối Đăng Nhập' },
+                  { id: 'isVerified', label: 'Xác Thực', align: 'center' },
                   { id: 'status', label: 'Trạng Thái' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'company', label: 'Ngày Tạo' },
                   { id: '', label: 'Edit' },
                 ]}
               />
               <TableBody>
-                {dataFiltered
-                  .slice(
-                    table.page * table.rowsPerPage,
-                    table.page * table.rowsPerPage + table.rowsPerPage
-                  )
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      row={row}
-                      selected={table.selected.includes(row.id)}
-                      onSelectRow={() => table.onSelectRow(row.id)}
-                    />
-                  ))}
+                {userList.map((row) => (
+                  <UserTableRow
+                    key={row._id}
+                    row={row}
+                    selected={table.selected.includes(row._id)}
+                    roleList={roleList}
+                    onSelectRow={() => {
+                      table.onSelectRow(row._id);
+                    }}
+                    setUserSelected={setUserSelected}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
+                ))}
 
                 <TableEmptyRows
                   height={68}
                   emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
                 />
-
-                {notFound && <TableNoData searchQuery={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>
@@ -119,6 +137,13 @@ export function UserView() {
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+      {userSelected && (
+        <ModalEditUser
+          selectedUser={userSelected}
+          onClose={() => setUserSelected(null)}
+          onUpdateSuccess={handleInitData}
+        />
+      )}
     </DashboardContent>
   );
 }
