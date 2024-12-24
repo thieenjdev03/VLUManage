@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@mui/material';
-import Box from '@mui/material/Box';
+import { Modal, Box, Button, TextField, Typography } from '@mui/material';
 import DropdownComponent from 'src/components/custom-select/DropdownComponent';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { SingleValue } from 'react-select';
 import { User } from 'src/apis/types';
+import { useUserStore } from 'src/hooks/use-user-store';
 
 type OptionType = {
   value: string;
@@ -22,16 +23,14 @@ type FormDataType = {
 };
 
 type ModalEditUserProps = {
-  selectedUser: User | null; // Selected user data
-  onClose?: () => void; // Callback to close the modal
-  onUpdateSuccess?: () => void; // Callback to refresh the user list
+  isOpen: boolean;
+  selectedUser: User | null;
+  onClose: () => void;
 };
 
-const ModalEditUser: React.FC<ModalEditUserProps> = ({
-  selectedUser,
-  onClose,
-  onUpdateSuccess,
-}) => {
+const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onClose }) => {
+  const { setIsOpen } = useUserStore();
+
   const [formData, setFormData] = useState<FormDataType>({
     displayName: '',
     email: '',
@@ -72,25 +71,36 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({
 
     try {
       if (formData._id) {
-        const response = await axios.put(`http://localhost:3000/api/admin/users/${formData._id}`, {
-          displayName: formData.displayName,
-          email: formData.email,
-          phone: formData.phone,
-          role: formData.role,
-          personalEmail: formData.personalEmail,
-          status: formData.status,
-        });
-
+        const response = await axios.put(
+          `http://localhost:3000/api/admin/users/edit/${formData._id}`,
+          formData
+        );
         if (response.data) {
-          alert('Cập nhật thành công!');
+          setIsOpen(false);
+          onClose();
+          Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success').then(() =>
+            onClose()
+          );
         } else {
-          alert('Có lỗi xảy ra');
+          Swal.fire('Thất bại', 'Cập nhật người dùng thất bại', 'error');
         }
       }
     } catch (error) {
-      console.error('Error updating user:', error);
-      alert('Có lỗi xảy ra khi cập nhật người dùng');
+      console.error('Error:', error);
+      Swal.fire('Error', 'An error occurred while updating user', 'error');
     }
+  };
+
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
   };
 
   const roleOptions: OptionType[] = [
@@ -101,108 +111,50 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({
   ];
 
   return (
-    <div
-      className="modal fade"
-      id="editUserModal"
-      tabIndex={-1}
-      aria-labelledby="editUserModalLabel"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog modal-in-user-list">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title" id="editUserModalLabel">
-              Chỉnh sửa người dùng
-            </h5>
-            <Button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={onClose}
-            />
-          </div>
-          <div className="modal-body">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="fullName" className="form-label">
-                  Họ và tên
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.displayName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="personalEmail" className="form-label">
-                  Email cá nhân
-                </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="personalEmail"
-                  name="personalEmail"
-                  value={formData.personalEmail}
-                  onChange={handleChange}
-                />
-              </div>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <DropdownComponent
-                  placeholder="Chọn Chức Vụ"
-                  options={roleOptions}
-                  id="role-select"
-                  label="Chọn Chức Vụ"
-                  onChange={handleDropdownChange}
-                />
-              </Box>
-              <div className="mb-3">
-                <label htmlFor="phone" className="form-label">
-                  Số điện thoại
-                </label>
-                <input
-                  type="tel"
-                  className="form-control"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <button type="submit" className="btn btn-success w-100 v-primary-btn">
-                Cập nhật
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Modal open={isOpen} onClose={onClose}>
+      <Box sx={style}>
+        <Typography variant="h6" mb={2}>
+          Edit User
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Display Name"
+            name="displayName"
+            value={formData.displayName}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <TextField
+            label="Phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <DropdownComponent
+            placeholder="Select Role"
+            options={roleOptions}
+            onChange={handleDropdownChange}
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+            Save Changes
+          </Button>
+        </form>
+      </Box>
+    </Modal>
   );
 };
 

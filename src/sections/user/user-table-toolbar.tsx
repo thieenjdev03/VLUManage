@@ -20,28 +20,27 @@ export function UserTableToolbar({ numSelected, filterName, onFilterName }: User
     <Toolbar
       sx={{
         height: 96,
+        width: '60%',
         display: 'flex',
         justifyContent: 'space-between',
-        p: (theme) => theme.spacing(0, 1, 0, 3),
       }}
     >
-        <OutlinedInput
-          fullWidth
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="Tìm kiếm..."
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
-            </InputAdornment>
-          }
-          sx={{ maxWidth: 320 }}
-        />
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
+      <OutlinedInput
+        fullWidth
+        value={filterName}
+        onChange={onFilterName}
+        placeholder="Tìm kiếm..."
+        startAdornment={
+          <InputAdornment position="start">
+            <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+          </InputAdornment>
+        }
+      />
+      <Tooltip title="Filter list">
+        <IconButton>
+          <Iconify icon="ic:round-filter-list" />
+        </IconButton>
+      </Tooltip>
     </Toolbar>
   );
 }

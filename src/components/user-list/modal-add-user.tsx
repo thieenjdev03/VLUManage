@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button } from '@mui/material';
-import { Iconify } from 'src/components/iconify';
-import Box from '@mui/material/Box';
+import { Modal, Box, Button, TextField, Typography } from '@mui/material';
 import DropdownComponent from 'src/components/custom-select/DropdownComponent';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { SingleValue } from 'react-select';
+import { useUserStore } from 'src/hooks/use-user-store';
 
 type OptionType = {
   value: string;
@@ -21,6 +21,7 @@ type FormDataType = {
 };
 
 const ModalAddUser: React.FC = () => {
+  const { setIsOpenAdd, isOpenAdd } = useUserStore(); // State quản lý modal
   const [formData, setFormData] = useState<FormDataType>({
     fullName: '',
     email: '',
@@ -46,7 +47,7 @@ const ModalAddUser: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/admin/users', {
+      const response = await axios.put('http://localhost:3000/api/admin/users', {
         displayName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
@@ -56,7 +57,6 @@ const ModalAddUser: React.FC = () => {
       });
 
       if (response.data) {
-        alert('Thêm mới thành công!');
         setFormData({
           fullName: '',
           email: '',
@@ -65,12 +65,26 @@ const ModalAddUser: React.FC = () => {
           personalEmail: '',
           status: true,
         });
+
+        setIsOpenAdd(false);
+
+        Swal.fire({
+          title: 'Thành Công!',
+          text: 'Thêm người dùng thành công.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
       } else {
-        alert('Có lỗi xảy ra');
+        setIsOpenAdd(false);
+        Swal.fire('Thất bại', 'Có lỗi xảy ra', 'error');
       }
     } catch (error) {
       console.error('Error adding user:', error);
-      alert('Có lỗi xảy ra khi thêm người dùng');
+
+      // Đóng modal trước khi hiển thị Swal
+      setIsOpenAdd(false);
+
+      Swal.fire('Thất bại', 'Có lỗi xảy ra khi thêm người dùng', 'error');
     }
   };
 
@@ -81,122 +95,78 @@ const ModalAddUser: React.FC = () => {
     { value: '675efcfcf5200355f4e3c04e', label: 'Chưa phân quyền' },
   ];
 
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+  };
+
   return (
-    <>
-      <Button
-        data-bs-toggle="modal"
-        data-bs-target="#addUserModal"
-        id="addUserModalLabel"
-        variant="contained"
-        color="inherit"
-        startIcon={<Iconify icon="mingcute:add-line" />}
-      >
-        Thêm Người Dùng
-      </Button>
-      {/* Modal */}
-      <div
-        className="modal fade"
-        id="addUserModal"
-        tabIndex={-1}
-        aria-labelledby="addUserModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-in-user-list">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="addUserModalLabel">
-                Thêm người dùng mới
-              </h5>
-              <Button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              />
-            </div>
-            <div className="modal-body">
-              {/* Form */}
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="fullName" className="form-label">
-                    Họ và tên
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="fullName"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="personalEmail" className="form-label">
-                    Email cá nhân
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="personalEmail"
-                    name="personalEmail"
-                    value={formData.personalEmail}
-                    onChange={handleChange}
-                  />
-                </div>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                    marginBottom: '16px',
-                  }}
-                >
-                  <DropdownComponent
-                    placeholder="Chọn Chức Vụ"
-                    options={roleOptions}
-                    id="role-select"
-                    label="Chọn Chức Vụ"
-                    onChange={handleDropdownChange}
-                  />
-                </Box>
-                <div className="mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    Số điện thoại
-                  </label>
-                  <input
-                    type="tel"
-                    className="form-control"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <button type="submit" className="btn btn-success w-100 v-primary-btn">
-                  Thêm
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+    <Modal open={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
+      <Box sx={style}>
+        <Typography variant="h6" mb={2}>
+          Thêm người dùng mới
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Họ và tên"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <TextField
+            label="Email cá nhân"
+            name="personalEmail"
+            value={formData.personalEmail}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Số điện thoại"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+          <DropdownComponent
+            placeholder="Chọn Chức Vụ"
+            options={roleOptions}
+            onChange={handleDropdownChange}
+          />
+          <Button
+            style={{ backgroundColor: '#D62134' }}
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Thêm
+          </Button>
+        </form>
+      </Box>
+    </Modal>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import moment from 'moment';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -12,40 +12,86 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 import type { User } from 'src/apis/types';
-import { find } from 'lodash';
 import { getListRole } from 'src/apis/services/userService';
 import { Button } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
 import axios from 'axios';
-
+import { useUserStore } from 'src/hooks/use-user-store';
+import Swal from 'sweetalert2';
 // ----------------------------------------------------------------------
 
 type UserTableRowProps = {
   row: User;
   selected: boolean;
   onSelectRow: () => void;
-  setUserSelected: Dispatch<SetStateAction<User | null>>;
   roleList: { _id: string; tenrole: string }[];
-  onDeleteSuccess: () => void;
 };
 
 type Role = {
   _id: string;
   tenrole: string;
 };
-export function UserTableRow({
-  row,
-  selected,
-  onSelectRow,
-  setUserSelected,
-  roleList,
-  onDeleteSuccess,
-}: UserTableRowProps) {
-  const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
+export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTableRowProps) {
+  const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+  const { setUserSelected, setIsOpen } = useUserStore();
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
   }, []);
+
+  const handleAction = async (action: string, data: User) => {
+    switch (action) {
+      case 'edit':
+        setIsOpen(true);
+        setUserSelected(data);
+        break;
+
+      case 'delete': {
+        try {
+          const result = await Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: `Bạn muốn xoá người dùng ${data.displayName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+          });
+
+          if (result.isConfirmed) {
+            // Xóa người dùng nếu xác nhận
+            const success = await apiDeleteUser(data._id);
+            if (success) {
+              Swal.fire({
+                title: 'Thành Công!',
+                text: 'Người dùng đã được xoá.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+              });
+              handleClosePopover();
+            } else {
+              Swal.fire({
+                title: 'Thất Bại!',
+                text: 'Không thể xoá người dùng. Vui lòng thử lại.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          Swal.fire({
+            title: 'Lỗi!',
+            text: 'Đã xảy ra lỗi trong quá trình xoá người dùng.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  };
 
   const handleClosePopover = useCallback(() => {
     setOpenPopover(null);
@@ -60,48 +106,27 @@ export function UserTableRow({
     try {
       const response = await axios.delete(`http://localhost:3000/api/admin/users/${id}`);
       if (response.data) {
-        alert('Thao tác thành công!');
-        return true; // Return if successful
+        Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success');
+        return true;
       }
-      alert('Có lỗi xảy ra'); // Move outside of the else block
-      return false; // Return failure
+      alert('Có lỗi xảy ra');
+      Swal.fire('Thất bại', 'Có lỗi xảy ra', 'error');
+
+      return false;
     } catch (error) {
       console.error('Error deleting user:', error);
-      return false; // Return failure in case of an error
+      return false;
     }
   };
 
-  const getTenRoleById = (
-    roles: { _id: string; tenrole: string }[],
-    id: string
-  ): string | undefined => {
-    const matchedRole = find(roles, { _id: id });
-    return matchedRole?.tenrole; // Return tenrole if match found, else undefined
-  };
-
+  const roleMap = useMemo(
+    () => new Map(roleList.map((role) => [role._id, role.tenrole])),
+    [roleList]
+  );
+  const getTenRoleById = (id: string): string | undefined => roleMap.get(id);
   const formatDateToLocal = (isoDate: string): string => {
     const result = isoDate ? moment(isoDate).format('YYYY-MM-DD HH:mm:ss') : '-';
     return result;
-  };
-  const handleAction = async (action: string, data: User) => {
-    switch (action) {
-      case 'edit':
-        setUserSelected(data);
-        break;
-      case 'delete': {
-        const confirmed = window.confirm(`Bạn có chắc muốn xoá người dùng ${data.displayName}?`);
-        if (confirmed) {
-          const success = await apiDeleteUser(data._id);
-          if (success) {
-            onDeleteSuccess();
-            handleClosePopover();
-          }
-        }
-        break;
-      }
-      default:
-        break;
-    }
   };
   return (
     <>
@@ -124,9 +149,10 @@ export function UserTableRow({
           {row.email}
         </TableCell>
 
-        <TableCell>{getTenRoleById(roleList, row.role)}</TableCell>
+        <TableCell>{getTenRoleById(row.role)}</TableCell>
 
-        <TableCell>{formatDateToLocal(row.lastLogin)}</TableCell>
+        {/* <TableCell>{formatDateToLocal(row.lastLogin)}</TableCell> */}
+        <TableCell>{row.phone}</TableCell>
 
         <TableCell align="center">
           {row.status ? (
@@ -140,7 +166,6 @@ export function UserTableRow({
           <Label color={!row.status ? 'error' : 'success'}>
             {handleRenderStatusActive(row.status)}
           </Label>
-          {/* <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label> */}
         </TableCell>
 
         <TableCell align="right">
@@ -184,7 +209,6 @@ export function UserTableRow({
               Chỉnh Sửa
             </Button>
           </MenuItem>
-
           <MenuItem onClick={() => handleAction('delete', row)} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Xóa

@@ -14,70 +14,77 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
 import Select from 'react-select';
 import type { User } from 'src/apis/types';
+import { Button } from '@mui/material';
 import { Role } from 'src/apis/types';
+import { useUserStore } from 'src/hooks/use-user-store';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows } from '../utils';
+
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
-
   const [filterName, setFilterName] = useState('');
   const [userList, setUserList] = useState<User[]>([]);
-  const [userSelected, setUserSelected] = useState<User | null>(null);
+  const { setUserSelected, userSelected, isOpen, setIsOpenAdd } = useUserStore();
   const [roleList, setRoleList] = useState<Role[]>([]);
 
   useEffect(() => {
-    handleInitData();
-    handleGetRoleList();
+    const fetchData = async () => {
+      const [users, roles] = await Promise.all([getUsers(), getListRole()]);
+      setUserList(users);
+      setRoleList(roles);
+    };
+    fetchData();
   }, []);
-
-  const handleGetRoleList = async () => {
-    const roles = await getListRole();
-    setRoleList(roles);
+  console.log('check render');
+  const handleOpenModal = () => {
+    setIsOpenAdd(true);
   };
 
-  const handleDeleteSuccess = () => {
-    handleInitData(); // Re-fetch the user list
-  };
-
-  const handleInitData = async () => {
-    const users = await getUsers();
-    setUserList(users);
-  };
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={2} mt={1}>
         <Typography variant="h4" flexGrow={1}>
           Quản Lý Người Dùng
         </Typography>
+        <Button
+          style={{ backgroundColor: '#141414' }}
+          onClick={handleOpenModal}
+          variant="contained"
+        >
+          Thêm Người Dùng
+        </Button>
         <ModalAddUser />
       </Box>
       <Card>
         <div className="flex align-items-center justify-end">
-          <Select
-            options={[
-              { value: 'all', label: 'Tất cả' },
-              { value: 'verified', label: 'Đã xác thực' },
-              { value: 'unverified', label: 'Chưa xác thực' },
-            ]}
-            placeholder="Lọc theo trạng thái"
-            isClearable
-            isSearchable={false}
-            onChange={(value) => console.log(value)}
-          />
-          <UserTableToolbar
-            numSelected={table.selected.length}
-            filterName={filterName}
-            onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setFilterName(event.target.value);
-              table.onResetPage();
-            }}
-          />
+          <div className="flex align-items-center justify-end">
+            <Select
+              options={[
+                { value: 'all', label: 'Tất cả' },
+                { value: 'verified', label: 'Đã xác thực' },
+                { value: 'unverified', label: 'Chưa xác thực' },
+              ]}
+              placeholder="Lọc theo trạng thái"
+              isClearable
+              isSearchable={false}
+              onChange={(value) => console.log(value)}
+            />
+            <UserTableToolbar
+              numSelected={table.selected.length}
+              filterName={filterName}
+              onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setFilterName(event.target.value);
+                table.onResetPage();
+              }}
+            />
+          </div>
         </div>
+
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -98,7 +105,7 @@ export function UserView() {
                   { id: 'emailDisplay', label: 'Email' },
                   { id: 'role', label: 'Chức vụ' },
                   { id: 'lastLogin', label: 'Lần Cuối Đăng Nhập' },
-                  { id: 'isVerified', label: 'Xác Thực', align: 'center' },
+                  { id: 'phoneNumber', label: 'SĐT', align: 'center' },
                   { id: 'status', label: 'Trạng Thái' },
                   { id: '', label: 'Edit' },
                 ]}
@@ -113,8 +120,6 @@ export function UserView() {
                     onSelectRow={() => {
                       table.onSelectRow(row._id);
                     }}
-                    setUserSelected={setUserSelected}
-                    onDeleteSuccess={handleDeleteSuccess}
                   />
                 ))}
 
@@ -139,9 +144,9 @@ export function UserView() {
       </Card>
       {userSelected && (
         <ModalEditUser
+          isOpen={isOpen}
           selectedUser={userSelected}
           onClose={() => setUserSelected(null)}
-          onUpdateSuccess={handleInitData}
         />
       )}
     </DashboardContent>

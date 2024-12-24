@@ -2,9 +2,9 @@ import ReactDOM from 'react-dom/client';
 import { Suspense, StrictMode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { msalConfig } from "src/authConfig";
-import { MsalProvider } from "@azure/msal-react";
-import { PublicClientApplication } from "@azure/msal-browser";
+import { msalConfig } from 'src/authConfig';
+import { MsalProvider } from '@azure/msal-react';
+import { PublicClientApplication } from '@azure/msal-browser';
 import App from './app';
 import 'bootstrap';
 
@@ -17,10 +17,9 @@ root.render(
     <HelmetProvider>
       <BrowserRouter>
         <Suspense>
-        <MsalProvider instance={msalInstance}>
+          <MsalProvider instance={msalInstance}>
             <App />
-            </MsalProvider>
-
+          </MsalProvider>
         </Suspense>
       </BrowserRouter>
     </HelmetProvider>
