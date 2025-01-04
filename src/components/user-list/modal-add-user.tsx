@@ -156,6 +156,7 @@ const ModalAddUser: React.FC = () => {
             placeholder="Chọn Chức Vụ"
             options={roleOptions}
             onChange={handleDropdownChange}
+            value={roleOptions.find((option) => option.value === formData.role)}
           />
           <Button
             style={{ backgroundColor: '#D62134' }}
