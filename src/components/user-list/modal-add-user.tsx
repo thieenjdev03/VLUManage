@@ -47,7 +47,7 @@ const ModalAddUser: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.put('http://localhost:3000/api/admin/users', {
+      const response = await axios.put('http://localhost:3002/api/admin/users', {
         displayName: formData.fullName,
         email: formData.email,
         phone: formData.phone,

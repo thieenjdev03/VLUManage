@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest, msalConfig } from "src/authConfig";
+import { loginRequest, msalConfig } from 'src/authConfig';
 import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
@@ -21,19 +21,19 @@ export function SignInView() {
   const { instance } = useMsal();
   const router = useRouter();
 
-  const handleMsAuth = () =>{ 
+  const handleMsAuth = () => {
     console.log('handleLogin', msalConfig);
     instance
-    .loginPopup(loginRequest)
-    .then((response) => {
-      console.log("Login success:", response);
-      router.push('/');
-    })
-    .catch((error) => {
-      console.error("Login failed:", error);
-    });
-  }
-  const LoginCard = ({ title, image, description, text, link, msAuth}: LoginCardProps) => (
+      .loginPopup(loginRequest)
+      .then((response) => {
+        console.log('Login success:', response);
+        router.push('/');
+      })
+      .catch((error) => {
+        console.error('Login failed:', error);
+      });
+  };
+  const LoginCard = ({ title, image, description, text, link, msAuth }: LoginCardProps) => (
     <Box
       onClick={() => (!msAuth ? navigate(link) : handleMsAuth())}
       className="login-item-card flex flex-col items-center justify-between"
@@ -62,7 +62,10 @@ export function SignInView() {
         <Typography variant="h5" className="login-item-title login-item-text-color">
           {title}
         </Typography>
-        <Typography variant="body1" className="login-item-description text-md login-item-text-color">
+        <Typography
+          variant="body1"
+          className="login-item-description text-md login-item-text-color"
+        >
           {description}
         </Typography>
         <Typography variant="body1" className="login-item-text login-item-text-color">
@@ -72,7 +75,6 @@ export function SignInView() {
     </Box>
   );
 
-  
   return (
     <div className="flex flex-col items-center">
       <h1
@@ -91,7 +93,7 @@ export function SignInView() {
           image="https://static.vecteezy.com/system/resources/thumbnails/028/339/963/small_2x/microsoft-icon-logo-symbol-free-png.png"
           description="Sinh Viên & Quản Lý"
           text="Đăng nhập với tài khoản Microsoft 365."
-          link="/sign-in-vlu" 
+          link="/sign-in-vlu"
           msAuth
         />
         <LoginCard

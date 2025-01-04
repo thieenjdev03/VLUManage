@@ -72,7 +72,7 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
     try {
       if (formData._id) {
         const response = await axios.put(
-          `http://localhost:3000/api/admin/users/edit/${formData._id}`,
+          `http://localhost:3002/api/admin/users/edit/${formData._id}`,
           formData
         );
         if (response.data) {

@@ -1,8 +1,8 @@
-// src/config/index.ts
-const ENV = process.env.NODE_ENV;
+const API_BASE_URL =
+  import.meta.env.MODE === 'production'
+    ? import.meta.env.VITE_API_URL_PROD // Production API
+    : import.meta.env.VITE_API_URL; // Development API
 
-export const API_BASE_URL = (() => {
-  if (ENV === 'development') return 'http://localhost:3000';
-  if (ENV === 'staging') return 'https://staging.api.example.com';
-  return 'https://api.example.com';
-})();
+console.log('Base API URL:', API_BASE_URL);
+
+export default API_BASE_URL;

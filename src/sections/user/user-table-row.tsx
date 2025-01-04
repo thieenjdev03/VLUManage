@@ -104,7 +104,7 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
 
   const apiDeleteUser = async (id: string) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/api/admin/users/${id}`);
+      const response = await axios.delete(`http://localhost:3002/api/admin/users/${id}`);
       if (response.data) {
         Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success');
         return true;
