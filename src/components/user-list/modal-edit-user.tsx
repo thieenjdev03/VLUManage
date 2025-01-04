@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Button, TextField, Typography } from '@mui/material';
 import DropdownComponent from 'src/components/custom-select/DropdownComponent';
 import Swal from 'sweetalert2';
-import axios from 'axios';
 import { SingleValue } from 'react-select';
 import { User } from 'src/apis/types';
 import { useUserStore } from 'src/hooks/use-user-store';
+import axiosInstance from 'src/apis/config/axios';
 
 type OptionType = {
   value: string;
@@ -19,7 +19,6 @@ type FormDataType = {
   phone: string;
   role: string;
   personalEmail: string;
-  status: boolean;
 };
 
 type ModalEditUserProps = {
@@ -37,7 +36,6 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
     phone: '',
     role: '',
     personalEmail: '',
-    status: true,
   });
 
   useEffect(() => {
@@ -49,7 +47,6 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
         phone: selectedUser.phone,
         role: selectedUser.role,
         personalEmail: selectedUser.personalEmail,
-        status: selectedUser.status,
       });
     }
   }, [selectedUser]);
@@ -59,11 +56,14 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleDropdownChange = (selectedOption: SingleValue<OptionType>) => {
-    setFormData({
-      ...formData,
-      role: selectedOption ? selectedOption.value : '',
-    });
+  const handleDropdownChange = (
+    action: keyof FormDataType,
+    selectedOption: SingleValue<OptionType>
+  ) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [action]: selectedOption ? selectedOption.value : '',
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,16 +71,14 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
 
     try {
       if (formData._id) {
-        const response = await axios.put(
-          `http://localhost:3002/api/admin/users/edit/${formData._id}`,
-          formData
-        );
+        const response = await axiosInstance.put(`/api/admin/users/edit/${formData._id}`, formData);
         if (response.data) {
           setIsOpen(false);
           onClose();
-          Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success').then(() =>
-            onClose()
-          );
+          Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success').then(() => {
+            window.location.reload();
+            onClose();
+          });
         } else {
           Swal.fire('Thất bại', 'Cập nhật người dùng thất bại', 'error');
         }
@@ -109,7 +107,10 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
     { value: '67593968b4c9c77f87657a18', label: 'Giảng viên' },
     { value: '675efcfcf5200355f4e3c04e', label: 'Chưa phân quyền' },
   ];
-
+  const statusOptions: OptionType[] = [
+    { value: '1', label: 'Khóa Tài Khoản' },
+    { value: '0', label: 'Hoạt Động' },
+  ];
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style}>
@@ -145,10 +146,19 @@ const ModalEditUser: React.FC<ModalEditUserProps> = ({ isOpen, selectedUser, onC
             margin="normal"
           />
           <DropdownComponent
-            placeholder="Select Role"
+            placeholder="Chọn Vai Trò"
             options={roleOptions}
-            onChange={handleDropdownChange}
+            onChange={(selectedOption) => {
+              handleDropdownChange('role', selectedOption);
+            }}
           />
+          {/* <DropdownComponent
+            placeholder="Chọn trạng thái"
+            options={statusOptions}
+            onChange={(selectedOption) => {
+              handleDropdownChange('status', selectedOption);
+            }}
+          /> */}
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
             Save Changes
           </Button>

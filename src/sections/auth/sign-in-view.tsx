@@ -93,7 +93,7 @@ export function SignInView() {
           image="https://static.vecteezy.com/system/resources/thumbnails/028/339/963/small_2x/microsoft-icon-logo-symbol-free-png.png"
           description="Sinh Viên & Quản Lý"
           text="Đăng nhập với tài khoản Microsoft 365."
-          link="/sign-in-vlu"
+          link="https://vlu-attendance-server.vercel.app/auth/microsoft"
           msAuth
         />
         <LoginCard
@@ -101,14 +101,14 @@ export function SignInView() {
           image="https://cdn.haitrieu.com/wp-content/uploads/2022/12/Icon-Dai-Hoc-Van-Lang.png"
           description="Sinh Viên & Quản Lý"
           text="Đăng nhập với tài khoản Văn Lang."
-          link="/sign-in-vlu" // Link trang đích
+          link="https://vlu-attendance-server.vercel.app/auth/microsoft"
         />
         <LoginCard
           title="Đăng nhập"
           image="https://cdn-icons-png.flaticon.com/512/2942/2942813.png"
           description="Supper Admin"
           text="Đăng nhập với tài khoản được cấp cho Admin."
-          link="/sign-in-vlu" // Link nội bộ trang web
+          link="/sign-in-vlu"
         />
       </div>
     </div>

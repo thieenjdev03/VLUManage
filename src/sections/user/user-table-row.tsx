@@ -9,6 +9,7 @@ import MenuList from '@mui/material/MenuList';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import DropdownComponent from 'src/components/custom-select/DropdownComponent';
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 import type { User } from 'src/apis/types';
@@ -17,18 +18,24 @@ import { Button } from '@mui/material';
 import axios from 'axios';
 import { useUserStore } from 'src/hooks/use-user-store';
 import Swal from 'sweetalert2';
-// ----------------------------------------------------------------------
+import axiosInstance from 'src/apis/config/axios';
+import { SingleValue } from 'react-select';
 
+// ----------------------------------------------------------------------
+type OptionType = {
+  value: string | number;
+  label: string;
+};
+
+type OptionTypeString = {
+  value: number;
+  label: string;
+};
 type UserTableRowProps = {
   row: User;
   selected: boolean;
   onSelectRow: () => void;
   roleList: { _id: string; tenrole: string }[];
-};
-
-type Role = {
-  _id: string;
-  tenrole: string;
 };
 
 export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTableRowProps) {
@@ -104,17 +111,17 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
 
   const apiDeleteUser = async (id: string) => {
     try {
-      const response = await axios.delete(`http://localhost:3002/api/admin/users/${id}`);
+      const response = await axiosInstance.delete(`/api/admin/users/${id}`);
       if (response.data) {
-        Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success');
+        Swal.fire('Thành công', 'Xóa người dùng thành công', 'success');
+        window.location.reload();
         return true;
       }
-      alert('Có lỗi xảy ra');
-      Swal.fire('Thất bại', 'Có lỗi xảy ra', 'error');
-
+      Swal.fire('Thất bại', 'Có lỗi xảy ra khi xóa người dùng', 'error');
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error);
+      Swal.fire('Thất bại', 'Có lỗi xảy ra khi xóa người dùng', 'error');
       return false;
     }
   };
@@ -124,10 +131,45 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
     [roleList]
   );
   const getTenRoleById = (id: string): string | undefined => roleMap.get(id);
-  const formatDateToLocal = (isoDate: string): string => {
-    const result = isoDate ? moment(isoDate).format('YYYY-MM-DD HH:mm:ss') : '-';
-    return result;
+  const statusOptions: OptionType[] = [
+    { value: 1, label: 'Khóa Tài Khoản' },
+    { value: 0, label: 'Hoạt Động' },
+  ];
+  type FormDataType = {
+    status: string | number;
   };
+  const [formData, setFormData] = useState<FormDataType>({
+    status: 0,
+  });
+
+  const handleDropdownChange = async (
+    use_id: string,
+    action: keyof FormDataType,
+    selectedOption: SingleValue<OptionType>
+  ) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [action]: selectedOption ? selectedOption.value : 0,
+    }));
+    try {
+      if (use_id) {
+        const response = await axiosInstance.put(`/api/admin/users/${use_id}`, formData);
+        if (response.data) {
+          Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success').then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire('Thất bại', 'Cập nhật người dùng thất bại', 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire('Error', 'An error occurred while updating user', 'error');
+    }
+    console.log(selectedOption);
+    console.log('formData checkkkk', formData);
+  };
+
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -155,7 +197,7 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
         <TableCell>{row.phone}</TableCell>
 
         <TableCell align="center">
-          {row.status ? (
+          {!row.status ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
             '-'
@@ -163,9 +205,14 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
         </TableCell>
 
         <TableCell>
-          <Label color={!row.status ? 'error' : 'success'}>
-            {handleRenderStatusActive(row.status)}
-          </Label>
+          <DropdownComponent
+            placeholder="Chọn trạng thái"
+            options={statusOptions}
+            onChange={(selectedOption) => {
+              handleDropdownChange(row._id, 'status', selectedOption);
+            }}
+            value={statusOptions.find((option) => option.value === row.status)}
+          />
         </TableCell>
 
         <TableCell align="right">

@@ -1,4 +1,5 @@
 import 'src/global.css';
+import 'src/theme/styles/styles.scss';
 import Fab from '@mui/material/Fab';
 import { Router } from 'src/routes/sections';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
@@ -36,9 +37,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <MsalProvider instance={msalInstance}>
-        {githubButton}
-      </MsalProvider>
+      <MsalProvider instance={msalInstance}>{githubButton}</MsalProvider>
       <Router />
     </ThemeProvider>
   );

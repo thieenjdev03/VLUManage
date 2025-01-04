@@ -52,7 +52,10 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     },
     [handleClosePopover, router]
   );
-
+  const loginLocalStorageAccessKey = JSON.parse(localStorage.getItem('msal.account.keys') || '');
+  const loginAccessJSON = JSON.parse(localStorage.getItem(loginLocalStorageAccessKey[0]) || '{}');
+  console.log('loginAccessJSON', loginAccessJSON);
+  console.log('loginAccessJSON', loginLocalStorageAccessKey);
   return (
     <>
       <IconButton
@@ -86,11 +89,11 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {loginAccessJSON?.name}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
+            {loginAccessJSON?.username}
           </Typography>
         </Box>
 
@@ -132,7 +135,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button onClick = {handleLogout} fullWidth color="error" size="medium" variant="text">
+          <Button onClick={handleLogout} fullWidth color="error" size="medium" variant="text">
             Logout
           </Button>
         </Box>

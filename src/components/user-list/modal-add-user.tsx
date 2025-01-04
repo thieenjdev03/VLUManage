@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { SingleValue } from 'react-select';
 import { useUserStore } from 'src/hooks/use-user-store';
+import axiosInstance from 'src/apis/config/axios';
 
 type OptionType = {
   value: string;
@@ -47,7 +48,7 @@ const ModalAddUser: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.put('http://localhost:3002/api/admin/users', {
+      const response = await axiosInstance.post('/api/admin/users', {
         displayName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
@@ -73,6 +74,8 @@ const ModalAddUser: React.FC = () => {
           text: 'Thêm người dùng thành công.',
           icon: 'success',
           confirmButtonText: 'OK',
+        }).then(() => {
+          window.location.reload();
         });
       } else {
         setIsOpenAdd(false);

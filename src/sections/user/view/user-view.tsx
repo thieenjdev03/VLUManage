@@ -22,7 +22,6 @@ import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows } from '../utils';
-
 // ----------------------------------------------------------------------
 
 export function UserView() {
@@ -40,6 +39,7 @@ export function UserView() {
     };
     fetchData();
   }, []);
+
   console.log('check render');
   const handleOpenModal = () => {
     setIsOpenAdd(true);
@@ -47,33 +47,93 @@ export function UserView() {
 
   return (
     <DashboardContent>
-      <Box display="flex" alignItems="center" mb={2} mt={1}>
-        <Typography variant="h4" flexGrow={1}>
-          Quản Lý Người Dùng
-        </Typography>
-        <Button
-          style={{ backgroundColor: '#141414' }}
-          onClick={handleOpenModal}
-          variant="contained"
-        >
-          Thêm Người Dùng
-        </Button>
-        <ModalAddUser />
-      </Box>
       <Card>
-        <div className="flex align-items-center justify-end">
-          <div className="flex align-items-center justify-end">
-            <Select
-              options={[
-                { value: 'all', label: 'Tất cả' },
-                { value: 'verified', label: 'Đã xác thực' },
-                { value: 'unverified', label: 'Chưa xác thực' },
-              ]}
-              placeholder="Lọc theo trạng thái"
-              isClearable
-              isSearchable={false}
-              onChange={(value) => console.log(value)}
-            />
+        <div className="flex align-items-end">
+          <div className="user-role-filter-section flex gap-3  px-4 py-3 align-items-center w-50">
+            <div className="flex flex-col">
+              <Box display="flex" alignItems="center" mb={2} mt={1}>
+                <Typography variant="h4" flexGrow={1}>
+                  Quản Lý Người Dùng
+                </Typography>
+                <ModalAddUser />
+              </Box>
+              <div className="flex align-items-center gap-3">
+                <span>Loc Theo Role:</span>
+                <button
+                  type="button"
+                  className="user-role-item p-1 rounded-none active"
+                  style={{
+                    background: '#ffff',
+                    color: '#141414',
+                    border: 'none',
+                    borderBottom: '2px solid #141414',
+                    borderRadius: '1px',
+                  }}
+                >
+                  Tất cả
+                </button>
+                <button
+                  type="button"
+                  className="user-role-item p-1 rounded-none active"
+                  style={{
+                    background: '#ffff',
+                    color: '#141414',
+                    border: 'none',
+                    borderRadius: '1px',
+                  }}
+                >
+                  Giảng Viên
+                </button>
+                <button
+                  type="button"
+                  className="user-role-item p-2 rounded-none "
+                  style={{
+                    background: '#ffff',
+                    color: '#141414',
+                    border: 'none',
+                    borderRadius: '1px',
+                  }}
+                >
+                  Sinh Viên
+                </button>
+                <button
+                  type="button"
+                  className="user-role-item p-2 rounded-none "
+                  style={{
+                    background: '#ffff',
+                    color: '#141414',
+                    border: 'none',
+                    borderRadius: '1px',
+                  }}
+                >
+                  Admin
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="p-4">
+            <Button
+              style={{ backgroundColor: '#141414' }}
+              onClick={handleOpenModal}
+              variant="contained"
+            >
+              Thêm Người Dùng
+            </Button>
+          </div>
+          <div className="flex align-items-center justify-end p-2">
+            <div className="flex gap-3">
+              <Select
+                options={[
+                  { value: 'all', label: 'Tất cả' },
+                  { value: 'verified', label: 'Đã xác thực' },
+                  { value: 'unverified', label: 'Chưa xác thực' },
+                ]}
+                placeholder="Lọc theo trạng thái"
+                isClearable
+                isSearchable={false}
+                onChange={(value) => console.log(value)}
+              />
+            </div>
             <UserTableToolbar
               numSelected={table.selected.length}
               filterName={filterName}
@@ -84,7 +144,6 @@ export function UserView() {
             />
           </div>
         </div>
-
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
@@ -104,8 +163,8 @@ export function UserView() {
                   { id: 'displayName', label: 'Họ Tên' },
                   { id: 'emailDisplay', label: 'Email' },
                   { id: 'role', label: 'Chức vụ' },
-                  { id: 'lastLogin', label: 'Lần Cuối Đăng Nhập' },
-                  { id: 'phoneNumber', label: 'SĐT', align: 'center' },
+                  { id: 'phoneNumber', label: 'Số Điện Thoại', align: 'center' },
+                  { id: 'lastLogin', label: 'Verified' },
                   { id: 'status', label: 'Trạng Thái' },
                   { id: '', label: 'Edit' },
                 ]}
@@ -131,7 +190,6 @@ export function UserView() {
             </Table>
           </TableContainer>
         </Scrollbar>
-
         <TablePagination
           component="div"
           page={table.page}
@@ -142,6 +200,7 @@ export function UserView() {
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+
       {userSelected && (
         <ModalEditUser
           isOpen={isOpen}
