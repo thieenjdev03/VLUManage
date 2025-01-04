@@ -104,11 +104,6 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
     setOpenPopover(null);
   }, []);
 
-  const handleRenderStatusActive = (status: boolean) => {
-    const statusActive = status ? 'Đang hoạt động' : 'Đã khoá';
-    return statusActive;
-  };
-
   const apiDeleteUser = async (id: string) => {
     try {
       const response = await axiosInstance.delete(`/api/admin/users/${id}`);
@@ -132,8 +127,8 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
   );
   const getTenRoleById = (id: string): string | undefined => roleMap.get(id);
   const statusOptions: OptionType[] = [
-    { value: 1, label: 'Khóa Tài Khoản' },
-    { value: 0, label: 'Hoạt Động' },
+    { value: 0, label: 'Khóa Tài Khoản' },
+    { value: 1, label: 'Hoạt Động' },
   ];
   type FormDataType = {
     status: string | number;
@@ -147,13 +142,12 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
     action: keyof FormDataType,
     selectedOption: SingleValue<OptionType>
   ) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [action]: selectedOption ? selectedOption.value : 0,
-    }));
+    console.log('selectedOption', selectedOption);
+    const newFormData = { ...formData, [action]: selectedOption?.value };
     try {
       if (use_id) {
-        const response = await axiosInstance.put(`/api/admin/users/${use_id}`, formData);
+        console.log('formData', newFormData);
+        const response = await axiosInstance.put(`/api/admin/users/${use_id}`, newFormData);
         if (response.data) {
           Swal.fire('Thành công', 'Cập nhật người dùng thành công', 'success').then(() => {
             window.location.reload();
@@ -197,7 +191,7 @@ export function UserTableRow({ row, selected, onSelectRow, roleList }: UserTable
         <TableCell>{row.phone}</TableCell>
 
         <TableCell align="center">
-          {!row.status ? (
+          {row.status ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
             '-'
